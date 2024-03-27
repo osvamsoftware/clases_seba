@@ -1,4 +1,6 @@
 import 'package:clase_1/cubit/contador_cubit.dart';
+import 'package:clase_1/domain/user/cubit/usuarios_cubit.dart';
+import 'package:clase_1/domain/user/datasource_user.dart';
 import 'package:clase_1/pagina2.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -23,15 +25,25 @@ class App1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ContadorCubit(),
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
-          useMaterial3: true,
+    return RepositoryProvider(
+      create: (context) => DataSourceUser(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => ContadorCubit(),
+          ),
+          BlocProvider(
+            create: (context) => UsuariosCubit(context.read<DataSourceUser>()),
+          ),
+        ],
+        child: MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
+            useMaterial3: true,
+          ),
+          home: const ContadorCubitScreen(),
         ),
-        home: const ContadorCubitScreen(),
       ),
     );
   }
@@ -107,7 +119,7 @@ class ContadorCubitScreen extends StatelessWidget {
           ),
           FloatingActionButton(
             onPressed: () {
-              context.read<ContadorCubit>().sumar();
+              context.read<UsuariosCubit>().crearUsuario();
             },
             tooltip: 'Increment',
             child: const Icon(Icons.add),
@@ -184,45 +196,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-// BlocBuilder<DataCubit, List<DocumentSnapshot>>(
-//   builder: (context, data) {
-//     // Usa los datos en tu interfaz de usuario
-//     return ListView.builder(
-//       itemCount: data.length,
-//       itemBuilder: (context, index) {
-//         // Construye los elementos de la lista
-//         return ListTile(
-//           title: Text(data[index]['campo']),
-//           // Otra información de tus documentos
-//         );
-//       },
-//     );
-//   },
-// )
-
-// import 'package:firebase_core/firebase_core.dart';
-
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp();
-//   runApp(MyApp());
-// }
-// Crear un Cubit para manejar los datos:
-// Crea un Cubit para manejar los estados de tus datos. Por ejemplo, podrías tener un Cubit llamado DataCubit.
-
-// dart
-// Copy code
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-
-// class DataCubit extends Cubit<List<DocumentSnapshot>> {
-//   DataCubit() : super([]);
-
-//   final CollectionReference _collection = FirebaseFirestore.instance.collection('tu_coleccion');
-
-//   void getData() {
-//     _collection.snapshots().listen((QuerySnapshot snapshot) {
-//       emit(snapshot.docs);
-//     });
-//   }
-// }
