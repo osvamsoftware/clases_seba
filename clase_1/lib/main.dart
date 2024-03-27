@@ -1,11 +1,20 @@
 import 'package:clase_1/cubit/contador_cubit.dart';
 import 'package:clase_1/pagina2.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+        apiKey: "AIzaSyCqUtdAb3EWqI1bvY-dXq9LbTLndOK5FrM",
+        authDomain: "clases-flutter.firebaseapp.com",
+        projectId: "clases-flutter",
+        storageBucket: "clases-flutter.appspot.com",
+        messagingSenderId: "138568975740",
+        appId: "1:138568975740:web:05e61b95159cd1cc9a10f9"),
+  );
   runApp(const App1());
 }
 
