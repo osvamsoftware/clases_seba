@@ -1,8 +1,11 @@
 import 'package:clase_1/cubit/contador_cubit.dart';
+import 'package:clase_1/pagina2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-void main() {
+void main() async {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp();
   runApp(const App1());
 }
 
@@ -30,35 +33,55 @@ class ContadorCubitScreen extends StatelessWidget {
   const ContadorCubitScreen({
     super.key,
   });
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          const Text(
-            'You have pushed the button this many times:',
-          ),
-          BlocBuilder<ContadorCubit, ContadorState>(
-            builder: (context, state) {
-              if (state is ContadorLoading) {
-                return CircularProgressIndicator();
-              } else if (state is ContadorInitial) {
-                return Text(
-                  'INICIAR CONTADOR ',
-                  style: Theme.of(context).textTheme.headlineMedium!.copyWith(color: Colors.amber),
-                );
-              } else {
-                return Text(
-                  state.currentIndex.toString(),
-                  style: Theme.of(context).textTheme.displayLarge!.copyWith(),
-                );
-              }
-            },
-          ),
-          NuevoWidget()
-        ],
+      body: BlocConsumer<ContadorCubit, ContadorState>(
+        listenWhen: (previous, current) => current.currentIndex != previous.currentIndex,
+        listener: (context, state) {
+          if (state.currentIndex == 5) {
+            showDialog(
+              context: context,
+              builder: (context) => const Dialog(
+                child: SizedBox(
+                  height: 100,
+                  width: 100,
+                  child: Text('Todo ok'),
+                ),
+              ),
+            );
+          }
+          if (state.currentIndex == 10) {
+            Navigator.push(
+              context,
+              MaterialPageRoute<void>(
+                builder: (BuildContext context) => const Paginas2(),
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is ContadorLoading) {
+            return const CircularProgressIndicator();
+          }
+          if (state is ContadorDone) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Text(
+                  'You have pushed the button this many times:',
+                ),
+                // const CircularProgressIndicator(),
+                Text(state.currentIndex.toString()),
+                const NuevoWidget(),
+              ],
+            );
+          } else {
+            return Center(
+              child: Text('Estado desconocido'),
+            );
+          }
+        },
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -70,7 +93,7 @@ class ContadorCubitScreen extends StatelessWidget {
             tooltip: 'Increment',
             child: const Icon(Icons.reset_tv),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           FloatingActionButton(
@@ -102,7 +125,7 @@ class NuevoWidget extends StatelessWidget {
             builder: (context, state) {
               return Text(
                 (state.currentIndex + 1).toString(),
-                style: TextStyle(fontSize: 25),
+                style: const TextStyle(fontSize: 25),
               );
             },
           ),
@@ -152,3 +175,45 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+// BlocBuilder<DataCubit, List<DocumentSnapshot>>(
+//   builder: (context, data) {
+//     // Usa los datos en tu interfaz de usuario
+//     return ListView.builder(
+//       itemCount: data.length,
+//       itemBuilder: (context, index) {
+//         // Construye los elementos de la lista
+//         return ListTile(
+//           title: Text(data[index]['campo']),
+//           // Otra información de tus documentos
+//         );
+//       },
+//     );
+//   },
+// )
+
+// import 'package:firebase_core/firebase_core.dart';
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp();
+//   runApp(MyApp());
+// }
+// Crear un Cubit para manejar los datos:
+// Crea un Cubit para manejar los estados de tus datos. Por ejemplo, podrías tener un Cubit llamado DataCubit.
+
+// dart
+// Copy code
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+
+// class DataCubit extends Cubit<List<DocumentSnapshot>> {
+//   DataCubit() : super([]);
+
+//   final CollectionReference _collection = FirebaseFirestore.instance.collection('tu_coleccion');
+
+//   void getData() {
+//     _collection.snapshots().listen((QuerySnapshot snapshot) {
+//       emit(snapshot.docs);
+//     });
+//   }
+// }
